@@ -13,7 +13,7 @@ This module manages the Lambda functions in Connor's AWS account.
 
 ## Layers
 
-Lambda layers are **not imported** into this module — layer versions are immutable (you can never modify a deployed version, only publish new ones), so there's nothing Terraform would manage. Their ARNs are referenced directly as string literals in each function's `.tf` file.
+Lambda layers are managed in the dedicated `controlled_resources/lambda_layers/` module. Their ARNs are referenced directly as string literals in each function's `.tf` file here.
 
 | Layer ARN | Used by |
 |---|---|

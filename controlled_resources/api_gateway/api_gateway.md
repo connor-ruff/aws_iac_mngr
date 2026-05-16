@@ -27,7 +27,9 @@ Snowflake external functions work by calling an HTTP endpoint (API Gateway) whic
 
 | File | Contents |
 |---|---|
-| `main.tf` | S3 backend + AWS provider |
-| `api.tf` | REST API, resources, methods, integrations, method responses, deployment, stage, and Lambda permissions |
-| `imports.tf` | Import blocks for all 13 resources |
+| `main.tf` | S3 backend, AWS provider, and shared `locals` |
+| `rest_api.tf` | `aws_api_gateway_rest_api` + import |
+| `route_ebird.tf` | ebird resource, method, integration, method response, Lambda permission + imports |
+| `route_zeta_ball.tf` | zeta ball resource, method, integration, method response, Lambda permission + imports |
+| `deployment.tf` | `aws_api_gateway_deployment` + `aws_api_gateway_stage` + imports |
 | `api_gateway.md` | This file |

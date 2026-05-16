@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket         = "connor-ruff-terraform-state"
-    key            = "s3/terraform.tfstate"
+    key            = "lambda_layers/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "terraform-state-lock"
     profile        = "connor-ruff-dev-acct"
@@ -21,11 +21,6 @@ provider "aws" {
 }
 
 locals {
-  # Shared config applied to all buckets
-  encryption_rule = {
-    apply_server_side_encryption_by_default = {
-      sse_algorithm = "AES256"
-    }
-    bucket_key_enabled = true
-  }
+  account_id = "676058464455"
+  region     = "us-east-2"
 }

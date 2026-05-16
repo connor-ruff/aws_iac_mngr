@@ -23,6 +23,7 @@ The `flexible_time_window` means EventBridge can fire the schedule up to N minut
 | File | Contents |
 |---|---|
 | `main.tf` | S3 backend + AWS provider |
-| `schedules.tf` | `aws_scheduler_schedule` resources |
-| `imports.tf` | Import blocks for all 3 schedules |
+| `schedule_books_refresh.tf` | `books_refresh` schedule + import |
+| `schedule_stkz_refresh.tf` | `stkz_refresh` schedule + import |
+| `schedule_zeta_ball_api_pull.tf` | `zeta_ball_api_pull` schedule + import |
 | `eventbridge.md` | This file |
