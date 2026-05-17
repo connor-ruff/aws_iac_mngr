@@ -1,0 +1,8 @@
+{
+  "source_bucket": "connors-misc-blob-for-blobs",
+  "source_key": "books/excel_stage/KDP_Orders-6bc809c0-1960-46c2-8c0e-370b225a1c07.xlsx",
+  "sheet_name": "Combined Sales",
+  "dest_bucket": "connors-misc-blob-for-blobs",
+  "dest_key": "books/csv_stage/combined_sales/combined_sales-test.csv",
+  "move_after_operation": false
+}
