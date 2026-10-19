@@ -45,3 +45,5 @@ terraform.rc
 
 controlled_resources/lambda/function_code/**/lambda-package.zip
 documentation/aws-cli-commands/
+
+.vscode/
