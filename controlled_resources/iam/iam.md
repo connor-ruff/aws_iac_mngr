@@ -15,6 +15,7 @@ Each IAM entity (a role plus its policies and attachments) lives in its own `.tf
 | `lambda_ebird.tf` | Lambda role for eBird API data pulls |
 | `lambda_gdrive_to_snowflake.tf` | Lambda role for the Google Drive → Snowflake pipeline |
 | `lambda_zeta_ball.tf` | Lambda role for the Zeta Ball API → Snowflake pipeline |
+| `lambda_zeta_ball_walter.tf` | Lambda role for the Walter API → Snowflake pipeline (logs, read `zetaball-walter-api-key`, write S3 `zeta_ball_walter/*`) |
 | `rds_monitoring.tf` | RDS enhanced monitoring role |
 | `snowflake_external_function.tf` | Role that allows Snowflake to call API Gateway endpoints |
 | `snowflake_s3_integration.tf` | Role that allows Snowflake to read from S3 |

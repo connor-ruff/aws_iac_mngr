@@ -47,3 +47,6 @@ controlled_resources/lambda/function_code/**/lambda-package.zip
 documentation/aws-cli-commands/
 
 .vscode/
+# Python bytecode
+__pycache__/
+*.pyc

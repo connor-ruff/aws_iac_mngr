@@ -8,6 +8,7 @@ This module manages the Lambda functions in Connor's AWS account.
 |---|---|---|---|---|
 | `gdrive_to_snowflake_pipe` | `lambda-gdrive-to-snowflake-pipe` | Reads files from Google Drive and loads them to Snowflake. Invokes the Excel→CSV helper as a sub-step. | Python 3.8 | 5 min |
 | `zeta_ball_api_to_sf` | `lambda-zeta-ball-api-to-sf` | Pulls data from the Zeta Ball (Yahoo Fantasy) API and loads it to Snowflake. | Python 3.13 | ~4 min |
+| `zeta_ball_walter_api_to_sf` | `lambda-zeta-ball-walter-api-to-sf` | Pulls data from Walter's zetaball.com League Data API and loads it to Snowflake. Scaffold only (blank handler). | Python 3.13 | 1 min |
 | `ebird_general_refresher` | `lambda-ebird-general-refresher` | Pulls bird sighting data from the eBird API and writes it to S3. | Python 3.13 | ~10 min |
 | `convert_excel_bytes_to_csv` | `lambda-convert-excel-bytes-to-csv` | Helper function: accepts Excel bytes and returns CSV. Called by the GDrive pipeline. | Python 3.9 | 1 min |
 
@@ -54,8 +55,10 @@ Each Lambda function has its own `.tf` file containing the `aws_lambda_function`
 | `main.tf` | S3 backend, AWS provider, and shared `locals` |
 | `lambda_gdrive_to_snowflake_pipe.tf` | `gdrive_to_snowflake_pipe` function + import |
 | `lambda_zeta_ball_api_to_sf.tf` | `zeta_ball_api_to_sf` function + import |
+| `lambda_zeta_ball_walter_api_to_sf.tf` | `zeta_ball_walter_api_to_sf` function (no import; created by OpenTofu) |
 | `lambda_ebird_general_refresher.tf` | `ebird_general_refresher` function + import |
 | `lambda_convert_excel_bytes_to_csv.tf` | `convert_excel_bytes_to_csv` function + import |
 | `placeholder.zip` | Dummy zip satisfying the code source requirement — never deployed |
 | `function_code/zeta-ball-api-to-sf/` | Source code + build script for `lambda-zeta-ball-api-to-sf` |
+| `function_code/zeta-ball-walter-api-to-sf/` | Source code + build script for `lambda-zeta-ball-walter-api-to-sf` |
 | `function_code/ebird-general-refresher/` | Source code + build script for `lambda-ebird-general-refresher` |

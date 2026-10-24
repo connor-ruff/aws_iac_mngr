@@ -12,16 +12,17 @@ Snowflake external functions work by calling an HTTP endpoint (API Gateway) whic
 - Regional endpoint
 - Resource policy restricts access to `sf-external-function-role` assumed by Snowflake
 
-**Routes (both POST, AWS_IAM auth, Lambda proxy integration):**
+**Routes (all POST, AWS_IAM auth, Lambda proxy integration):**
 
 | Path | Lambda target |
 |---|---|
 | `POST /lambda-ebird-general-refresher` | `lambda-ebird-general-refresher` |
 | `POST /lambda-zeta-ball-refresh` | `lambda-zeta-ball-api-to-sf` |
+| `POST /lambda-zeta-ball-walter-refresh` | `lambda-zeta-ball-walter-api-to-sf` |
 
 **Stage:** `prod`
 
-**Lambda permissions:** Two `aws_lambda_permission` resources grant API Gateway the right to invoke each Lambda. These are the resource-based policy statements on the Lambda side.
+**Lambda permissions:** One `aws_lambda_permission` per route grants API Gateway the right to invoke each Lambda. These are the resource-based policy statements on the Lambda side.
 
 ## File structure
 
@@ -31,5 +32,6 @@ Snowflake external functions work by calling an HTTP endpoint (API Gateway) whic
 | `rest_api.tf` | `aws_api_gateway_rest_api` + import |
 | `route_ebird.tf` | ebird resource, method, integration, method response, Lambda permission + imports |
 | `route_zeta_ball.tf` | zeta ball resource, method, integration, method response, Lambda permission + imports |
+| `route_zeta_ball_walter.tf` | Walter API route: resource, method, integration, method response, Lambda permission (new, no imports) |
 | `deployment.tf` | `aws_api_gateway_deployment` + `aws_api_gateway_stage` + imports |
 | `api_gateway.md` | This file |

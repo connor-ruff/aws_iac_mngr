@@ -7,7 +7,7 @@ resource "aws_api_gateway_rest_api" "snowflake_ext_func" {
   }
 
   # Resource policy: allows sf-external-function-role (assumed by Snowflake) to
-  # invoke both POST routes.
+  # invoke all POST routes.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -22,6 +22,12 @@ resource "aws_api_gateway_rest_api" "snowflake_ext_func" {
         Principal = { AWS = "arn:aws:sts::${local.account_id}:assumed-role/sf-external-function-role/snowflake" }
         Action    = "execute-api:Invoke"
         Resource  = "arn:aws:execute-api:${local.region}:${local.account_id}:${local.api_id}/*/POST/lambda-ebird-general-refresher"
+      },
+      {
+        Effect    = "Allow"
+        Principal = { AWS = "arn:aws:sts::${local.account_id}:assumed-role/sf-external-function-role/snowflake" }
+        Action    = "execute-api:Invoke"
+        Resource  = "arn:aws:execute-api:${local.region}:${local.account_id}:${local.api_id}/*/POST/lambda-zeta-ball-walter-refresh"
       }
     ]
   })
