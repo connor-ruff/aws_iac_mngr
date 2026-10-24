@@ -3,6 +3,7 @@ from utils import *
 
 # REFRESH_TYPE_ID values sent by STG.ZETA_BALL_WALTER_REFRESH_LAMBDA_TRIGGER
 REFRESH_MATCHUPS = 1
+REFRESH_TEAMS = 2
 
 
 def lambda_handler(event, context):
@@ -16,6 +17,9 @@ def lambda_handler(event, context):
         if refresh_type_id == REFRESH_MATCHUPS:
             # input_field_1 = season, input_field_2 = week
             result = refresh_matchups(input_field_1, input_field_2)
+        elif refresh_type_id == REFRESH_TEAMS:
+            # input_field_1 = season
+            result = refresh_teams(input_field_1)
         else:
             raise ValueError(f'Unknown refresh_type_id: {refresh_type_id}')
     except Exception as e:

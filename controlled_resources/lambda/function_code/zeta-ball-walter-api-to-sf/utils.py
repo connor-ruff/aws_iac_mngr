@@ -58,3 +58,15 @@ def refresh_matchups(season, week):
     )
     drop_file_in_s3(data, f'{S3_PREFIX}/matchups/season_{season}/week_{week}.json')
     return 'SUCCESS'
+
+
+def refresh_teams(season):
+    """Pull the league's teams (team names, managers) for a season and drop the raw JSON in S3."""
+    api_key = get_api_key()
+    data = call_endpoint(
+        api_key,
+        f'/leagues/{LEAGUE_ID}/teams',
+        {'season': int(season)}
+    )
+    drop_file_in_s3(data, f'{S3_PREFIX}/teams/season_{season}.json')
+    return 'SUCCESS'
