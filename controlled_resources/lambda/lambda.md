@@ -8,7 +8,7 @@ This module manages the Lambda functions in Connor's AWS account.
 |---|---|---|---|---|
 | `gdrive_to_snowflake_pipe` | `lambda-gdrive-to-snowflake-pipe` | Reads files from Google Drive and loads them to Snowflake. Invokes the Excel→CSV helper as a sub-step. | Python 3.8 | 5 min |
 | `zeta_ball_api_to_sf` | `lambda-zeta-ball-api-to-sf` | Pulls data from the Zeta Ball (Yahoo Fantasy) API and loads it to Snowflake. | Python 3.13 | ~4 min |
-| `zeta_ball_walter_api_to_sf` | `lambda-zeta-ball-walter-api-to-sf` | Pulls data from Walter's zetaball.com League Data API and loads it to Snowflake. Scaffold only (blank handler). | Python 3.13 | 1 min |
+| `zeta_ball_walter_api_to_sf` | `lambda-zeta-ball-walter-api-to-sf` | Pulls data from Walter's zetaball.com League Data API and drops the raw JSON in S3 for Snowflake to load. Handler routes `refresh_type_id` 1 (matchups by season + week) and 2 (teams by season); invoked by the `STG.ZETA_BALL_WALTER_REFRESH_LAMBDA_TRIGGER` external function via API Gateway. | Python 3.13 | 1 min |
 | `ebird_general_refresher` | `lambda-ebird-general-refresher` | Pulls bird sighting data from the eBird API and writes it to S3. | Python 3.13 | ~10 min |
 | `convert_excel_bytes_to_csv` | `lambda-convert-excel-bytes-to-csv` | Helper function: accepts Excel bytes and returns CSV. Called by the GDrive pipeline. | Python 3.9 | 1 min |
 
