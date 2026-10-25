@@ -50,3 +50,6 @@ documentation/aws-cli-commands/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Locally generated build artifacts (e.g. placeholder Lambda zips)
+.build/
