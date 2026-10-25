@@ -13,8 +13,9 @@ This root owns the **slots**: network, database, login, Lambdas, API, website ho
 | `network.tf` | Private-only VPC (10.42.0.0/16, 2 subnets, **no IGW/NAT**), security groups, EC2 Instance Connect Endpoint |
 | `database.tf` | RDS Postgres 18, db.t4g.micro, IAM auth on, deletion protection |
 | `auth.tf` | Cognito user pool (self-signup off), hosted login domain, web client, first user |
-| `compute.tf` | `disci-api` and `disci-migrator` Lambdas (arm64, Python 3.13), IAM roles, log groups |
+| `compute.tf` | `disci-api`, `disci-migrator` and `disci-jobs` Lambdas (arm64, Python 3.13, one shared zip), IAM roles, log groups |
 | `api.tf` | HTTP API with Cognito JWT authorizer, throttling |
+| `schedules.tf` | EventBridge Scheduler: hourly `disci-jobs` run (recurring transactions), 2 retries |
 | `frontend.tf` | Private S3 bucket + CloudFront (OAC, SPA fallback, security headers) |
 | `ci.tf` | `disci-github-deploy` role (GitHub OIDC; `connor-ruff/disci` `main` only; code-only permissions) |
 | `budget.tf` | Monthly AWS Budgets alert on `project=disci` |
