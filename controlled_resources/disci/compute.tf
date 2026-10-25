@@ -1,6 +1,7 @@
-# Two Lambdas built from the same zip (the app repo's `api/`):
+# Three Lambdas built from the same zip (the app repo's `api/`):
 #   disci-api       FastAPI behind API Gateway (handler app.lambda_handler.handler)
 #   disci-migrator  creates DB roles, runs dbmate migrations (handler app.migrator.handler)
+#   disci-jobs      scheduled work: hourly recurring transactions (app.jobs.recurring.handler)
 # OpenTofu creates them with a placeholder; the app repo's deploy script uploads real code,
 # so code changes never show up as drift here.
 
@@ -18,6 +19,14 @@ data "archive_file" "placeholder" {
   }
   source {
     filename = "app/__init__.py"
+    content  = ""
+  }
+  source {
+    filename = "app/jobs/recurring.py"
+    content  = "def handler(event, context):\n    return 'not deployed yet'\n"
+  }
+  source {
+    filename = "app/jobs/__init__.py"
     content  = ""
   }
 }
@@ -144,5 +153,57 @@ data "aws_iam_policy_document" "lambda_assume" {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
+  }
+}
+
+# --- disci-jobs (scheduled work, e.g. hourly recurring transactions) -----------------
+
+resource "aws_iam_role" "jobs" {
+  name               = "${local.name}-jobs-lambda"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "jobs_vpc" {
+  role       = aws_iam_role.jobs.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+# Same database login as the API: RLS applies to jobs exactly as to requests.
+resource "aws_iam_role_policy" "jobs_rds_connect" {
+  name   = "rds-iam-connect"
+  role   = aws_iam_role.jobs.id
+  policy = aws_iam_role_policy.api_rds_connect.policy
+}
+
+resource "aws_cloudwatch_log_group" "jobs" {
+  name              = "/aws/lambda/${local.name}-jobs"
+  retention_in_days = 14
+}
+
+resource "aws_lambda_function" "jobs" {
+  function_name = "${local.name}-jobs"
+  role          = aws_iam_role.jobs.arn
+  handler       = "app.jobs.recurring.handler"
+  runtime       = "python3.13"
+  architectures = ["arm64"]
+  memory_size   = 512
+  timeout       = 120
+
+  filename         = data.archive_file.placeholder.output_path
+  source_code_hash = data.archive_file.placeholder.output_base64sha256
+
+  vpc_config {
+    subnet_ids         = aws_subnet.private[*].id
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  environment {
+    variables = aws_lambda_function.api.environment[0].variables
+  }
+
+  depends_on = [aws_cloudwatch_log_group.jobs]
+
+  lifecycle {
+    ignore_changes = [filename, source_code_hash]
   }
 }

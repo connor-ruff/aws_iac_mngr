@@ -13,6 +13,7 @@ locals {
     cognito_domain             = "https://${aws_cognito_user_pool_domain.main.domain}.auth.${local.region}.amazoncognito.com"
     lambda_api_name            = aws_lambda_function.api.function_name
     lambda_migrator_name       = aws_lambda_function.migrator.function_name
+    lambda_jobs_name           = aws_lambda_function.jobs.function_name
   }
 }
 

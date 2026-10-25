@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "deploy" {
           "lambda:GetFunctionConfiguration",
           "lambda:InvokeFunction",
         ]
-        Resource = [aws_lambda_function.api.arn, aws_lambda_function.migrator.arn]
+        Resource = [aws_lambda_function.api.arn, aws_lambda_function.migrator.arn, aws_lambda_function.jobs.arn]
       },
       {
         Sid      = "WebBucketList"
