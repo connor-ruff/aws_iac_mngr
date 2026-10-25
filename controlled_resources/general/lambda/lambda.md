@@ -14,7 +14,7 @@ This module manages the Lambda functions in Connor's AWS account.
 
 ## Layers
 
-Lambda layers are managed in the dedicated `controlled_resources/lambda_layers/` module. Their ARNs are referenced directly as string literals in each function's `.tf` file here.
+Lambda layers are managed in the dedicated `controlled_resources/general/lambda_layers/` module. Their ARNs are referenced directly as string literals in each function's `.tf` file here.
 
 | Layer ARN | Used by |
 |---|---|

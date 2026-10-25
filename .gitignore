@@ -43,7 +43,7 @@ terraform.rc
 # Uncomment the line below if you want to ignore planout files.
 # planout
 
-controlled_resources/lambda/function_code/**/lambda-package.zip
+controlled_resources/general/lambda/function_code/**/lambda-package.zip
 documentation/aws-cli-commands/
 
 .vscode/

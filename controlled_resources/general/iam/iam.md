@@ -74,7 +74,7 @@ Two roles (`snowflake_s3_integration.tf` and `snowflake_external_function.tf`) t
 These resources already exist in AWS. The `import` blocks tell OpenTofu to adopt them into state rather than creating new ones.
 
 ```bash
-cd iam/
+cd controlled_resources/general/iam/
 tofu init
 tofu plan   # should show only imports, no creates or destroys
 tofu apply  # executes the imports
