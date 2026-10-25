@@ -8,9 +8,13 @@ variable "admin_email" {
 }
 
 variable "github_repo" {
-  description = "owner/name of the app repo allowed to deploy via GitHub Actions."
+  description = <<-EOT
+    App repo allowed to deploy via GitHub Actions, as it appears in GitHub's OIDC `sub`
+    claim: <owner>@<owner_id>/<repo>@<repo_id>. GitHub includes the immutable numeric IDs,
+    so a deleted-and-recreated repo with the same name can't assume the role.
+  EOT
   type        = string
-  default     = "connor-ruff/disci"
+  default     = "connor-ruff@58089177/disci@1432836715"
 }
 
 variable "monthly_budget_usd" {
