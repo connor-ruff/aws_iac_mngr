@@ -68,6 +68,34 @@ resource "aws_cognito_user_pool_client" "web" {
   }
 }
 
+# Confidential client for Claude's custom connector (MCP). Cognito has no dynamic client
+# registration, so the client ID and secret are entered by hand in the connector's
+# Advanced settings. Claude's hosted apps always redirect to the callback below.
+resource "aws_cognito_user_pool_client" "mcp" {
+  name         = "${local.name}-mcp"
+  user_pool_id = aws_cognito_user_pool.main.id
+
+  generate_secret                      = true
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_scopes                 = ["openid", "email", "profile"]
+  supported_identity_providers         = ["COGNITO"]
+  callback_urls                        = ["https://claude.ai/api/mcp/auth_callback"]
+
+  explicit_auth_flows           = ["ALLOW_REFRESH_TOKEN_AUTH"]
+  prevent_user_existence_errors = "ENABLED"
+  enable_token_revocation       = true
+
+  id_token_validity      = 60
+  access_token_validity  = 60
+  refresh_token_validity = 30
+  token_validity_units {
+    id_token      = "minutes"
+    access_token  = "minutes"
+    refresh_token = "days"
+  }
+}
+
 resource "aws_cognito_user" "admin" {
   user_pool_id             = aws_cognito_user_pool.main.id
   username                 = var.admin_email
