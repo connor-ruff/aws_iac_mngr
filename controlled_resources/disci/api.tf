@@ -1,6 +1,7 @@
-# HTTP API in front of the API Lambda. Its JWT authorizer validates Cognito ID tokens
+# HTTP API in front of the API Lambda. Its JWT authorizer validates Cognito tokens
 # (signature, expiry, issuer, audience) before the Lambda runs; the Lambda reads the
-# verified claims from the request context. Only GET /health is unauthenticated.
+# verified claims from the request context. Only GET /health is unauthenticated here;
+# the MCP server's routes (mcp.tf) do their own auth.
 
 resource "aws_apigatewayv2_api" "main" {
   name          = "${local.name}-api"
@@ -21,9 +22,12 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
   authorizer_type  = "JWT"
   identity_sources = ["$request.header.Authorization"]
 
+  # For ID tokens the audience is checked against `aud`, for access tokens against
+  # `client_id`. The web app sends ID tokens; the MCP server forwards the access token
+  # Claude got from the disci-mcp client. The app then checks which kind it accepts.
   jwt_configuration {
     issuer   = "https://${aws_cognito_user_pool.main.endpoint}"
-    audience = [aws_cognito_user_pool_client.web.id]
+    audience = [aws_cognito_user_pool_client.web.id, aws_cognito_user_pool_client.mcp.id]
   }
 }
 

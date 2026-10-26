@@ -89,6 +89,8 @@ resource "aws_lambda_function" "api" {
       DISCI_DB_IAM_AUTH  = "true"
       DISCI_DATABASE_URL = "postgresql://disci_api@${local.db_endpoint}/disci?sslmode=require"
       DISCI_CORS_ORIGINS = jsonencode([local.web_origin])
+      # Access tokens from this client (forwarded by the MCP server) are accepted.
+      DISCI_MCP_CLIENT_ID = aws_cognito_user_pool_client.mcp.id
     }
   }
 

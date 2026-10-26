@@ -14,6 +14,8 @@ locals {
     lambda_api_name            = aws_lambda_function.api.function_name
     lambda_migrator_name       = aws_lambda_function.migrator.function_name
     lambda_jobs_name           = aws_lambda_function.jobs.function_name
+    lambda_mcp_name            = aws_lambda_function.mcp.function_name
+    mcp_url                    = "${aws_apigatewayv2_api.main.api_endpoint}/mcp"
   }
 }
 
