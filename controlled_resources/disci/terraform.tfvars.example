@@ -1,2 +1,5 @@
 # Copy to terraform.tfvars (gitignored) and fill in.
 admin_email = "you@example.com"
+
+# People invited to sign in (optional). Each gets an emailed temporary password.
+invited_emails = []

@@ -1,6 +1,6 @@
-# Cognito user pool for the web app. Self-signup is off: users are created here (or by
-# an admin). The first user gets a temporary password by email and sets a real one on
-# first sign-in through the hosted login page.
+# Cognito user pool for the web app. Self-signup is off (invite-only): users are created
+# here, the admin plus everyone in var.invited_emails. Each gets a temporary password by
+# email and sets a real one on first sign-in through the hosted login page.
 
 resource "aws_cognito_user_pool" "main" {
   name                     = local.name
@@ -75,6 +75,20 @@ resource "aws_cognito_user" "admin" {
 
   attributes = {
     email          = var.admin_email
+    email_verified = true
+  }
+}
+
+# Invited users (testers, friends): same as the admin user, one per email.
+resource "aws_cognito_user" "invited" {
+  for_each = toset(var.invited_emails)
+
+  user_pool_id             = aws_cognito_user_pool.main.id
+  username                 = each.value
+  desired_delivery_mediums = ["EMAIL"]
+
+  attributes = {
+    email          = each.value
     email_verified = true
   }
 }

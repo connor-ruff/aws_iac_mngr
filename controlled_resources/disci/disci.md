@@ -9,10 +9,10 @@ This root owns the **slots**: network, database, login, Lambdas, API, website ho
 | File | What |
 |---|---|
 | `main.tf` | Backend, providers, `default_tags` |
-| `variables.tf` | `admin_email` (in gitignored `terraform.tfvars`), repo name, budget |
+| `variables.tf` | `admin_email` and `invited_emails` (in gitignored `terraform.tfvars`), repo name, budget |
 | `network.tf` | Private-only VPC (10.42.0.0/16, 2 subnets, **no IGW/NAT**), security groups, EC2 Instance Connect Endpoint |
 | `database.tf` | RDS Postgres 18, db.t4g.micro, IAM auth on, deletion protection |
-| `auth.tf` | Cognito user pool (self-signup off), hosted login domain, web client, first user |
+| `auth.tf` | Cognito user pool (self-signup off: invite-only), hosted login domain, web client, the admin user and one user per invited email |
 | `compute.tf` | `disci-api`, `disci-migrator` and `disci-jobs` Lambdas (arm64, Python 3.13, one shared zip), IAM roles, log groups |
 | `api.tf` | HTTP API with Cognito JWT authorizer, throttling |
 | `schedules.tf` | EventBridge Scheduler: hourly `disci-jobs` run (recurring transactions), 2 retries |
@@ -37,6 +37,12 @@ tofu apply tfplan
 
 After the first apply:
 - Cognito emails `admin_email` a temporary password (set a real one at first sign-in).
+
+## Inviting people
+
+Sign-up is invite-only. To let someone in, add their email to `invited_emails` in `terraform.tfvars` (gitignored, since this repo is public), then plan and apply. Cognito emails them a temporary password, valid 7 days; they set their own at first sign-in. If it expires before they sign in, re-send it with `aws cognito-idp admin-create-user --user-pool-id <pool> --username <email> --message-action RESEND`.
+
+Removing an email deletes that Cognito user, so they can no longer sign in. Their app data stays in the database.
 - Activate the `project` cost allocation tag (Billing → Cost allocation tags) once it appears (up to 24h) so the budget filter matches.
 
 ## Connecting to the database from a laptop

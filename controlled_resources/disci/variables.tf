@@ -7,6 +7,18 @@ variable "admin_email" {
   sensitive   = true
 }
 
+variable "invited_emails" {
+  description = <<-EOT
+    Extra people who may sign in (self-signup is off). Each gets a Cognito user and an
+    emailed temporary password. Set in terraform.tfvars; removing an email deletes that
+    user from Cognito (their app data stays in the database).
+  EOT
+  type        = list(string)
+  default     = []
+  # Not `sensitive`: OpenTofu can't for_each over sensitive values. The list still only
+  # lives in the gitignored terraform.tfvars.
+}
+
 variable "github_repo" {
   description = <<-EOT
     App repo allowed to deploy via GitHub Actions, as it appears in GitHub's OIDC `sub`
