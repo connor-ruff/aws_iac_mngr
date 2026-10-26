@@ -11,6 +11,7 @@ This module manages the Secrets Manager secret containers in Connor's AWS accoun
 | `yahoo_fantasy_slop_api_keys` | `yahoo-fantasy--slop-api-keys` | Yahoo Fantasy API credentials for Zeta Ball basketball league |
 | `ebird_api_credentials` | `eBird-api-credentials` | eBird API credentials for account connorruff |
 | `zetaball_walter_api_key` | `zetaball-walter-api-key` | API key for the League Data API v1 on Walter's zetaball.com |
+| `disci_mcp_cognito_client_keys` | `disci-mcp-cognito-client-keys` | Client ID and secret of the Disci `disci-mcp` Cognito app client (Claude custom connector); tagged `project=disci` |
 
 ## What is and isn't managed
 
@@ -26,4 +27,5 @@ OpenTofu manages the **secret container** — the name, description, and metadat
 | `secret_yahoo_fantasy_slop_api_keys.tf` | `yahoo_fantasy_slop_api_keys` secret + import |
 | `secret_ebird_api_credentials.tf` | `ebird_api_credentials` secret + import |
 | `secret_zetaball_walter_api_key.tf` | `zetaball_walter_api_key` secret (new, no import) |
+| `secret_disci_mcp_cognito_client_keys.tf` | `disci_mcp_cognito_client_keys` secret (new, no import) |
 | `secrets_manager.md` | This file |

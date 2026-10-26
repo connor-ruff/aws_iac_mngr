@@ -46,3 +46,14 @@ output "db_master_password" {
   value       = random_password.db_master.result
   sensitive   = true
 }
+
+output "mcp_client_id" {
+  description = "Cognito client for Claude's custom connector (enter in Advanced settings)"
+  value       = aws_cognito_user_pool_client.mcp.id
+}
+
+output "mcp_client_secret" {
+  description = "tofu output -raw mcp_client_secret (enter in the connector's Advanced settings)"
+  value       = aws_cognito_user_pool_client.mcp.client_secret
+  sensitive   = true
+}
