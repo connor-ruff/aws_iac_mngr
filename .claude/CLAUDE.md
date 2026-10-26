@@ -6,6 +6,8 @@ This repo is meant to manage the personal AWS account of Connor Ruff via IaC
 
 **aws-cli-skill** (always active): Whenever you run any `aws ...` CLI command, log the command and its full output to a new file in `aws-cli-commands/` before doing anything else. See `.claude/skills/aws-cli-skill.md` for the exact format and naming rules.
 
+**manual actions log** (always active): Anything done by hand that OpenTofu does not manage (console clicks, root-only account settings, `aws` calls that change settings) must be recorded in `documentation/manual-actions.md`: add it under "Pending" when identified, and move it to "Done" (with date and how) once completed. Also note it in the relevant root's doc (e.g. `controlled_resources/disci/disci.md`). `aws` commands are additionally logged per the skill above.
+
 ## Project context
 
 - OpenTofu (not Terraform) for IaC

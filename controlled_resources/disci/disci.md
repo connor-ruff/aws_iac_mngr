@@ -43,7 +43,7 @@ After the first apply:
 Sign-up is invite-only. To let someone in, add their email to `invited_emails` in `terraform.tfvars` (gitignored, since this repo is public), then plan and apply. Cognito emails them a temporary password, valid 7 days; they set their own at first sign-in. If it expires before they sign in, re-send it with `aws cognito-idp admin-create-user --user-pool-id <pool> --username <email> --message-action RESEND`.
 
 Removing an email deletes that Cognito user, so they can no longer sign in. Their app data stays in the database.
-- Activate the `project` cost allocation tag (Billing → Cost allocation tags) once it appears (up to 24h) so the budget filter matches.
+- Activate the `project` cost allocation tag once it appears (up to 24h) so the budget filter matches. Tracked in `documentation/manual-actions.md` (the Billing console page may be blocked; use the `ce` CLI).
 
 ## Connecting to the database from a laptop
 
