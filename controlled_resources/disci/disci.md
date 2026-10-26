@@ -15,7 +15,7 @@ This root owns the **slots**: network, database, login, Lambdas, API, website ho
 | `auth.tf` | Cognito user pool (self-signup off: invite-only), hosted login domain, web client, the admin user and one user per invited email |
 | `compute.tf` | `disci-api`, `disci-migrator` and `disci-jobs` Lambdas (arm64, Python 3.13, one shared zip), IAM roles, log groups. API (and jobs) env includes `DISCI_MCP_CLIENT_ID` |
 | `api.tf` | HTTP API with Cognito JWT authorizer (audience: web client + `disci-mcp` client, since for access tokens API Gateway matches `client_id`), throttling |
-| `mcp.tf` | `disci-mcp` Lambda (MCP server for Claude's connector; arm64, Python 3.13, 512 MB, 25 s, **outside the VPC**, own zip), IAM role (basic execution only), log group, routes `ANY /mcp` and `GET /.well-known/{proxy+}` **without** the authorizer (the server does its own auth). Added 2026-10-26, not applied yet |
+| `mcp.tf` | `disci-mcp` Lambda (MCP server for Claude's connector; arm64, Python 3.13, 512 MB, 25 s, **outside the VPC**, own zip), IAM role (basic execution only), log group, routes `ANY /mcp` and `GET /.well-known/{proxy+}` **without** the authorizer (the server does its own auth). Added 2026-10-26 |
 | `schedules.tf` | EventBridge Scheduler: hourly `disci-jobs` run (recurring transactions), 2 retries |
 | `frontend.tf` | Private S3 bucket + CloudFront (OAC, SPA fallback, security headers) |
 | `ci.tf` | `disci-github-deploy` role (GitHub OIDC; `connor-ruff/disci` `main` only; code-only permissions on the api, migrator, jobs and mcp Lambdas) |
