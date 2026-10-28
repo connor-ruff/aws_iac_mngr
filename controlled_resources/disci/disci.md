@@ -13,9 +13,9 @@ This root owns the **slots**: network, database, login, Lambdas, API, website ho
 | `network.tf` | Private-only VPC (10.42.0.0/16, 2 subnets, **no IGW/NAT**), security groups, EC2 Instance Connect Endpoint |
 | `database.tf` | RDS Postgres 18, db.t4g.micro, IAM auth on, deletion protection |
 | `auth.tf` | Cognito user pool (self-signup off: invite-only), hosted login domain, web client, the admin user and one user per invited email |
-| `compute.tf` | `disci-api`, `disci-migrator` and `disci-jobs` Lambdas (arm64, Python 3.13, one shared zip), IAM roles, log groups. API (and jobs) env includes `DISCI_MCP_CLIENT_ID` |
+| `compute.tf` | `disci-api`, `disci-migrator` and `disci-jobs` Lambdas (arm64, Python 3.13, one shared zip), IAM roles, log groups, JSON log format. API (and jobs) env includes `DISCI_MCP_CLIENT_ID` |
 | `api.tf` | HTTP API with Cognito JWT authorizer (audience: web client + `disci-mcp` client, since for access tokens API Gateway matches `client_id`), throttling |
-| `mcp.tf` | `disci-mcp` Lambda (MCP server for Claude's connector; arm64, Python 3.13, 512 MB, 25 s, **outside the VPC**, own zip), IAM role (basic execution only), log group, routes `ANY /mcp` and `GET /.well-known/{proxy+}` **without** the authorizer (the server does its own auth). Added 2026-10-26 |
+| `mcp.tf` | `disci-mcp` Lambda (MCP server for Claude's connector; arm64, Python 3.13, 512 MB, 25 s, **outside the VPC**, own zip), IAM role (basic execution only), log group, JSON log format, routes `ANY /mcp` and `GET /.well-known/{proxy+}` **without** the authorizer (the server does its own auth). Added 2026-10-26 |
 | `schedules.tf` | EventBridge Scheduler: hourly `disci-jobs` run (recurring transactions), 2 retries |
 | `frontend.tf` | Private S3 bucket + CloudFront (OAC, SPA fallback, security headers) |
 | `ci.tf` | `disci-github-deploy` role (GitHub OIDC; `connor-ruff/disci` `main` only; code-only permissions on the api, migrator, jobs and mcp Lambdas) |

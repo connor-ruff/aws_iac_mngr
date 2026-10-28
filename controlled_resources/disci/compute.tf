@@ -74,6 +74,12 @@ resource "aws_lambda_function" "api" {
   memory_size   = 512
   timeout       = 15
 
+  # JSON lines: Lambda adds `requestId`, and Python logging's `extra=` fields become keys.
+  # Application log level is left to the code (INFO, set in each handler).
+  logging_config {
+    log_format = "JSON"
+  }
+
   filename         = data.archive_file.placeholder.output_path
   source_code_hash = data.archive_file.placeholder.output_base64sha256
 
@@ -126,6 +132,12 @@ resource "aws_lambda_function" "migrator" {
   architectures = ["arm64"]
   memory_size   = 512
   timeout       = 300
+
+  # JSON lines: Lambda adds `requestId`, and Python logging's `extra=` fields become keys.
+  # Application log level is left to the code (INFO, set in each handler).
+  logging_config {
+    log_format = "JSON"
+  }
 
   filename         = data.archive_file.placeholder.output_path
   source_code_hash = data.archive_file.placeholder.output_base64sha256
@@ -190,6 +202,12 @@ resource "aws_lambda_function" "jobs" {
   architectures = ["arm64"]
   memory_size   = 512
   timeout       = 120
+
+  # JSON lines: Lambda adds `requestId`, and Python logging's `extra=` fields become keys.
+  # Application log level is left to the code (INFO, set in each handler).
+  logging_config {
+    log_format = "JSON"
+  }
 
   filename         = data.archive_file.placeholder.output_path
   source_code_hash = data.archive_file.placeholder.output_base64sha256

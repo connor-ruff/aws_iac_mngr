@@ -46,6 +46,12 @@ resource "aws_lambda_function" "mcp" {
   memory_size   = 512
   timeout       = 25 # under API Gateway's 30 s
 
+  # JSON lines: Lambda adds `requestId`, and Python logging's `extra=` fields become keys.
+  # Application log level is left to the code (INFO, set in each handler).
+  logging_config {
+    log_format = "JSON"
+  }
+
   filename         = data.archive_file.mcp_placeholder.output_path
   source_code_hash = data.archive_file.mcp_placeholder.output_base64sha256
 
