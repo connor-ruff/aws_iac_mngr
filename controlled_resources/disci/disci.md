@@ -19,7 +19,8 @@ This root owns the **slots**: network, database, login, Lambdas, API, website ho
 | `schedules.tf` | EventBridge Scheduler: hourly `disci-jobs` run (recurring transactions), 2 retries |
 | `frontend.tf` | Private S3 bucket + CloudFront (OAC, SPA fallback, security headers) |
 | `ci.tf` | `disci-github-deploy` role (GitHub OIDC; `connor-ruff/disci` `main` only; code-only permissions on the api, migrator, jobs and mcp Lambdas) |
-| `budget.tf` | Monthly AWS Budgets alert on `project=disci` |
+| `alarms.tf` | SNS topic `disci-alarms` (email to `admin_email`), log metric filter `disci-recurring-failures` → `Disci/RecurringFailures`, and four CloudWatch alarms: `disci-jobs-crashed`, `disci-jobs-user-failures`, `disci-jobs-not-running`, `disci-api-5xx` (what each catches: app repo `docs/ops/deployment.md` §2.4) |
+| `budget.tf` | Monthly AWS Budgets alert on `project=disci` (costs and the budget: app repo `docs/ops/cost.md`) |
 | `outputs.tf` | Deploy config → SSM `/disci/prod/*` (incl. `lambda_mcp_name` and `mcp_url` = `<api endpoint>/mcp`, the connector URL); outputs |
 
 ## Why no NAT gateway
@@ -38,13 +39,14 @@ tofu apply tfplan
 
 After the first apply:
 - Cognito emails `admin_email` a temporary password (set a real one at first sign-in).
+- AWS emails `admin_email` a confirmation link for the `disci-alarms` SNS subscription; alarm emails start once it's clicked.
+- Activate the `project` cost allocation tag once it appears (up to 24h) so the budget filter matches: app repo `docs/ops/cost.md` §5. Tracked in `documentation/manual-actions.md` (the Billing console page may be blocked; use the `ce` CLI).
 
 ## Inviting people
 
 Sign-up is invite-only. To let someone in, add their email to `invited_emails` in `terraform.tfvars` (gitignored, since this repo is public), then plan and apply. Cognito emails them a temporary password, valid 7 days; they set their own at first sign-in. If it expires before they sign in, re-send it with `aws cognito-idp admin-create-user --user-pool-id <pool> --username <email> --message-action RESEND`.
 
 Removing an email deletes that Cognito user, so they can no longer sign in. Their app data stays in the database.
-- Activate the `project` cost allocation tag once it appears (up to 24h) so the budget filter matches. Tracked in `documentation/manual-actions.md` (the Billing console page may be blocked; use the `ce` CLI).
 
 ## Connecting to the database from a laptop
 
