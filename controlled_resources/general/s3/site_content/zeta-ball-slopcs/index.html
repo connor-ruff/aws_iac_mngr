@@ -61,7 +61,10 @@
   .state { padding: 32px 16px; text-align: center; color: var(--muted); }
 
   /* Presentation mode (?present): rows stay masked until clicked. */
-  body.present main { max-width: 760px; }
+  body.present main { max-width: 1400px; }
+  /* Present: ranks 1-9 left, 10-18 right, so all slots fit on one screen. */
+  body.present .boards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 800px) { body.present .boards { grid-template-columns: 1fr; } }
   body.present h1 { font-size: 40px; }
   body.present td { padding: 16px 18px; font-size: 20px; }
   body.present .rank { font-size: 24px; }
@@ -99,6 +102,7 @@
     <div class="meta" id="meta">Loading…</div>
   </header>
 
+  <div class="boards" id="boards">
   <div class="card">
     <table>
       <thead>
@@ -112,6 +116,7 @@
         <tr><td colspan="3" class="state">Loading rankings…</td></tr>
       </tbody>
     </table>
+  </div>
   </div>
   <div class="hint" id="hint" hidden>Click a row to reveal · Space / → next · ← undo · G reveal next 3</div>
 </main>
@@ -133,7 +138,7 @@
       `${seasonLabel(data.league_start_year)} season · Through week ${data.through_week} · Updated ${updated.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 
     const cell = (v) => PRESENT ? `<span class="reveal"><span>${v}</span></span>` : v;
-    document.getElementById('rows').innerHTML = data.rankings.map((r, i) => {
+    const rowHtml = (r, i) => {
       const cls = [];
       if (r.rank === 1 && !PRESENT) cls.push('top');
       if (PRESENT) cls.push('masked');
@@ -144,9 +149,22 @@
         <td class="l team">${cell(esc(r.team))}</td>
         <td class="score">${cell(score(r.slopcs_score))}</td>
       </tr>`;
-    }).join('');
+    };
 
-    if (PRESENT) setupPresent();
+    const rowsEl = document.getElementById('rows');
+    if (PRESENT) {
+      // Split into two side-by-side tables; group gaps restart in each.
+      const half = Math.ceil(data.rankings.length / 2);
+      rowsEl.innerHTML = data.rankings.slice(0, half).map(rowHtml).join('');
+      const card2 = rowsEl.closest('.card').cloneNode(true);
+      const tb2 = card2.querySelector('tbody');
+      tb2.removeAttribute('id');
+      tb2.innerHTML = data.rankings.slice(half).map(rowHtml).join('');
+      document.getElementById('boards').appendChild(card2);
+      setupPresent();
+    } else {
+      rowsEl.innerHTML = data.rankings.map(rowHtml).join('');
+    }
   }
 
   // ---- Presentation mode ----
@@ -155,8 +173,9 @@
   if (PRESENT) document.body.classList.add('present');
 
   function setupPresent() {
-    const tbody = document.getElementById('rows');
-    const rows = () => [...tbody.querySelectorAll('tr')];
+    const boards = document.getElementById('boards');
+    // Document order = rank order (left table, then right table).
+    const rows = () => [...boards.querySelectorAll('tbody tr')];
     const history = [];
     document.getElementById('hint').hidden = false;
 
@@ -170,8 +189,8 @@
     // Next row to reveal = lowest-ranked still masked (bottom of the table).
     const nextMasked = () => rows().reverse().find((tr) => tr.classList.contains('masked'));
 
-    tbody.addEventListener('click', (e) => {
-      const tr = e.target.closest('tr');
+    boards.addEventListener('click', (e) => {
+      const tr = e.target.closest('tbody tr');
       if (!tr) return;
       if (tr.classList.contains('masked')) show(tr);
       else { tr.classList.add('masked'); history.splice(history.indexOf(tr), 1); }
