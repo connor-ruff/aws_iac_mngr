@@ -59,6 +59,32 @@
   .score { font-weight: 700; }
   .top td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
   .state { padding: 32px 16px; text-align: center; color: var(--muted); }
+
+  /* Presentation mode (?present): rows stay masked until clicked. */
+  body.present main { max-width: 760px; }
+  body.present h1 { font-size: 40px; }
+  body.present td { padding: 16px 18px; font-size: 20px; }
+  body.present .rank { font-size: 24px; }
+  body.present tbody tr { cursor: pointer; user-select: none; }
+  body.present tr.group-start td { border-top: 16px solid var(--bg); }
+  .reveal { position: relative; display: block; }
+  /* Fixed-width bars so the mask never hints at name length. */
+  .reveal::after {
+    content: ''; position: absolute; top: 15%; bottom: 15%; border-radius: 6px;
+    background: var(--line); transition: opacity .35s ease;
+  }
+  td.team .reveal::after { left: 0; width: 11em; }
+  td.score .reveal::after { right: 0; width: 4.5em; }
+  tr.masked .reveal > span { opacity: 0; }
+  tr:not(.masked) .reveal::after { opacity: 0; }
+  tr:not(.masked) .reveal > span { opacity: 1; transition: opacity .5s ease .1s; }
+  tr.masked:hover .reveal::after { background: color-mix(in srgb, var(--accent) 25%, var(--line)); }
+  tr.just-revealed td { animation: pop .9s ease; }
+  @keyframes pop {
+    0% { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+    100% { background: transparent; }
+  }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 12px; text-align: center; }
   @media (max-width: 520px) {
     h1 { font-size: 26px; }
     th, td { padding: 10px 10px; }
@@ -87,6 +113,7 @@
       </tbody>
     </table>
   </div>
+  <div class="hint" id="hint" hidden>Click a row to reveal · Space / → next · ← undo · G reveal next 3</div>
 </main>
 
 <script>
@@ -105,12 +132,68 @@
     document.getElementById('meta').textContent =
       `${seasonLabel(data.league_start_year)} season · Through week ${data.through_week} · Updated ${updated.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 
-    document.getElementById('rows').innerHTML = data.rankings.map((r) => `
-      <tr class="${r.rank === 1 ? 'top' : ''}">
+    const cell = (v) => PRESENT ? `<span class="reveal"><span>${v}</span></span>` : v;
+    document.getElementById('rows').innerHTML = data.rankings.map((r, i) => {
+      const cls = [];
+      if (r.rank === 1 && !PRESENT) cls.push('top');
+      if (PRESENT) cls.push('masked');
+      if (PRESENT && i > 0 && i % GROUP === 0) cls.push('group-start');
+      return `
+      <tr class="${cls.join(' ')}">
         <td class="rank">${r.rank}</td>
-        <td class="l team">${esc(r.team)}</td>
-        <td class="score">${score(r.slopcs_score)}</td>
-      </tr>`).join('');
+        <td class="l team">${cell(esc(r.team))}</td>
+        <td class="score">${cell(score(r.slopcs_score))}</td>
+      </tr>`;
+    }).join('');
+
+    if (PRESENT) setupPresent();
+  }
+
+  // ---- Presentation mode ----
+  const PRESENT = new URLSearchParams(location.search).has('present');
+  const GROUP = 3;
+  if (PRESENT) document.body.classList.add('present');
+
+  function setupPresent() {
+    const tbody = document.getElementById('rows');
+    const rows = () => [...tbody.querySelectorAll('tr')];
+    const history = [];
+    document.getElementById('hint').hidden = false;
+
+    function show(tr) {
+      if (!tr || !tr.classList.contains('masked')) return;
+      tr.classList.remove('masked');
+      tr.classList.add('just-revealed');
+      setTimeout(() => tr.classList.remove('just-revealed'), 900);
+      history.push(tr);
+    }
+    // Next row to reveal = lowest-ranked still masked (bottom of the table).
+    const nextMasked = () => rows().reverse().find((tr) => tr.classList.contains('masked'));
+
+    tbody.addEventListener('click', (e) => {
+      const tr = e.target.closest('tr');
+      if (!tr) return;
+      if (tr.classList.contains('masked')) show(tr);
+      else { tr.classList.add('masked'); history.splice(history.indexOf(tr), 1); }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        show(nextMasked());
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'Backspace') {
+        e.preventDefault();
+        const tr = history.pop();
+        if (tr) tr.classList.add('masked');
+      } else if (e.key === 'g' || e.key === 'G') {
+        // Reveal the rest of the current bottom group of 3 (e.g. 18, 17, 16).
+        const all = rows();
+        const first = nextMasked();
+        if (!first) return;
+        const start = Math.floor(all.indexOf(first) / GROUP) * GROUP;
+        all.slice(start, start + GROUP).reverse().forEach((tr, k) => setTimeout(() => show(tr), k * 400));
+      }
+    });
   }
 
   fetch('data/latest.json', { cache: 'no-store' })
