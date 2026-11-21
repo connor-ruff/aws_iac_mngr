@@ -70,3 +70,14 @@ def refresh_teams(season):
     )
     drop_file_in_s3(data, f'{S3_PREFIX}/teams/season_{season}.json')
     return 'SUCCESS'
+
+def refresh_rosters():
+    """Pull the current season's rosters for all managers, with recent stats and schedule, and drop the raw JSON in S3."""
+    api_key = get_api_key()
+    data = call_endpoint(
+        api_key,
+        f'/leagues/{LEAGUE_ID}/rosters',
+        {'include_stats': 'true'}
+    )
+    drop_file_in_s3(data, f'{S3_PREFIX}/rosters/current.json')
+    return 'SUCCESS'
